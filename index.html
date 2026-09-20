@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KUMA</title>
+<meta name="theme-color" content="#075E54">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===================== AUTHENTIFICATION ===================== -->
+  <div id="authScreen" class="auth-screen">
+    <h1>KUMA</h1>
+    <p class="tagline" id="authTagline">Discutez librement, où que vous soyez</p>
+
+    <div class="lang-select">
+      <button data-lang="fr">Français</button>
+      <button data-lang="bm">Bamanankan</button>
+      <button data-lang="ff">Fulfulde</button>
+      <button data-lang="sn">Soninkanxanne</button>
+      <button data-lang="tm">Tamasheq</button>
+    </div>
+
+    <div id="step-phone">
+      <input type="tel" id="phoneInput" placeholder="+223 70 00 00 00">
+      <input type="text" id="displayName" placeholder="Votre nom">
+      <button class="primary" id="sendCodeBtn">Envoyer le code</button>
+      <div id="recaptcha-container"></div>
+    </div>
+
+    <div id="step-code" class="hidden">
+      <input type="text" id="codeInput" placeholder="Code reçu par SMS" inputmode="numeric">
+      <button class="primary" id="verifyCodeBtn">Vérifier</button>
+    </div>
+  </div>
+
+  <!-- ===================== APPLICATION PRINCIPALE ===================== -->
+  <div id="mainApp" class="hidden" style="display:flex;flex-direction:column;height:100%">
+
+    <div class="top-bar">
+      <h2>KUMA</h2>
+      <div class="icons">
+        <span>🔍</span>
+        <span id="menuBtn">⋮</span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button data-tab="chats" class="active">Discussions</button>
+      <button data-tab="status">Statuts</button>
+      <button data-tab="communities">Communautés</button>
+      <button data-tab="calls">Appels</button>
+    </div>
+
+    <!-- --- Discussions --- -->
+    <div id="panel-chats" class="tab-panel" style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <div class="filters">
+        <button class="active" data-filter="all">Toutes</button>
+        <button data-filter="unread">Non lues</button>
+        <button data-filter="favorites">Favoris</button>
+        <button data-filter="groups">Groupes</button>
+      </div>
+      <div class="panel" id="chatsList"></div>
+      <button class="fab" id="fabNewChat">＋</button>
+    </div>
+
+    <!-- --- Statuts --- -->
+    <div id="panel-status" class="tab-panel hidden panel" id="statusTabContent"></div>
+
+    <!-- --- Communautés (à venir) --- -->
+    <div id="panel-communities" class="tab-panel hidden panel">
+      <div class="empty-state">Les communautés arrivent bientôt.</div>
+    </div>
+
+    <!-- --- Appels --- -->
+    <div id="panel-calls" class="tab-panel hidden panel" id="callsTabContent"></div>
+
+  </div>
+
+  <!-- ===================== ÉCRAN DE CONVERSATION ===================== -->
+  <div id="chatScreen" class="chat-screen hidden">
+    <div class="chat-header">
+      <button class="back" id="backBtn">←</button>
+      <div class="avatar" style="width:38px;height:38px;font-size:14px" id="chatHeaderAvatar">?</div>
+      <div class="info">
+        <span class="name" id="chatHeaderName">Discussion</span>
+        <span class="status" id="chatHeaderStatus">en ligne</span>
+      </div>
+      <div class="actions">
+        <span onclick="alert('Appel vocal — sélectionnez un contact depuis Appels')">📞</span>
+        <span onclick="alert('Appel vidéo — sélectionnez un contact depuis Appels')">🎥</span>
+      </div>
+    </div>
+    <div class="messages" id="messagesList"></div>
+    <div class="composer">
+      <button id="attachBtn">📎</button>
+      <input type="file" id="imageInput" accept="image/*" class="hidden">
+      <input type="text" id="messageInput" placeholder="Message">
+      <button id="voiceBtn">🎤</button>
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
+
+  <!-- ===================== ÉCRAN D'APPEL ===================== -->
+  <div id="callScreen" class="call-screen hidden">
+    <video id="remoteVideo" autoplay playsinline class="hidden"></video>
+    <video id="localVideo" autoplay playsinline muted class="hidden"></video>
+    <div class="avatar" id="callPeerAvatar">?</div>
+    <h2 id="callPeerName">Contact</h2>
+    <div class="call-controls">
+      <button id="endCallBtn" class="end">☎</button>
+    </div>
+  </div>
+
+  <!-- ===================== MODALES ===================== -->
+  <div id="modalOverlay" class="modal-overlay hidden" onclick="if(event.target===this) closeModal()">
+    <div class="modal-sheet" id="modalSheet"></div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+</div>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/status.js"></script>
+<script src="js/calls.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch(console.error);
+  });
+}
+</script>
+</body>
+</html>
