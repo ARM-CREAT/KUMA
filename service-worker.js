@@ -1,15 +1,8 @@
 // KUMA — Service Worker : mode hors-ligne + faible consommation (2G/3G)
-const CACHE_NAME = "kuma-cache-v1";
+const CACHE_NAME = "kuma-cache-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
-  "./css/style.css",
-  "./js/firebase-config.js",
-  "./js/auth.js",
-  "./js/app.js",
-  "./js/chat.js",
-  "./js/status.js",
-  "./js/calls.js",
   "./manifest.json"
 ];
 

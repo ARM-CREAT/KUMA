@@ -17,6 +17,10 @@ service cloud.firestore {
       match /messages/{msgId} {
         allow read: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.members;
         allow create: if isSignedIn() && request.auth.uid == request.resource.data.senderId;
+        // Mise à jour par n'importe quel membre de la discussion : nécessaire pour les
+        // accusés de réception (deliveredTo/readBy) et les réactions envoyées par les
+        // autres participants, en plus de l'édition/suppression par l'auteur.
+        allow update: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.members;
       }
     }
 
@@ -28,7 +32,12 @@ service cloud.firestore {
     }
 
     match /calls/{callId} {
-      allow read, update: if isSignedIn() && request.auth.uid in resource.data.participants;
+      // Pour un appel de groupe, un nouveau participant doit pouvoir s'ajouter à
+      // participants alors qu'il n'y figure pas encore — on l'autorise donc aussi
+      // s'il fait partie des membres de la discussion (chatMembers).
+      allow read, update: if isSignedIn() &&
+        (request.auth.uid in resource.data.participants ||
+         request.auth.uid in resource.data.get("chatMembers", []));
       allow create: if isMe(request.resource.data.callerId);
 
       match /{sub=**} {
